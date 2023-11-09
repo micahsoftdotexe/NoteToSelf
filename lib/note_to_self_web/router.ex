@@ -1,14 +1,33 @@
 defmodule NoteToSelfWeb.Router do
+  # alias NoteToSelfWeb.AuthController
   use NoteToSelfWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
-    post("/api/login", NoteToSelfWeb.AuthController, :login)
-    post("/api/register", NoteToSelfWeb.AuthController, :register)
+  end
+
+  pipeline :auth do
+    plug NoteToSelf.Auth.Pipeline
+  end
+
+  pipeline :cookie_auth do
+    plug NoteToSelf.Auth.CookiePipeline
   end
 
   scope "/api", NoteToSelfWeb do
     pipe_through :api
+    post("/login", AuthController, :login)
+    post("/register", AuthController, :register)
+  end
+
+  scope "/api", NoteToSelfWeb do
+    pipe_through [:api, :auth]
+    get("/user", AuthController, :show)
+  end
+
+  scope "/api", NoteToSelfWeb do
+    pipe_through [:api, :cookie_auth]
+    get("/refresh", AuthController, :refresh)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
