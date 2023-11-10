@@ -31,7 +31,6 @@ defmodule NoteToSelfWeb.AuthController do
   end
 
   def refresh(conn, _) do
-
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Jason.encode!("Refreshed a token!"))

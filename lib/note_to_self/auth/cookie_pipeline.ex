@@ -4,8 +4,8 @@ defmodule NoteToSelf.Auth.CookiePipeline do
   error_handler: NoteToSelf.Auth.AuthErrorHandler
 
   # plug Guardian.Plug.VerifySession
-
-  plug Guardian.Plug.VerifySession, [refresh_from_cookie: true, key: "refresh_token"]
-  plug Guardian.Plug.EnsureAuthenticated, [claims: %{"typ" => "refresh"}, key: "refresh_token"]
+  # plug Guardian.Plug.VerifyCookie, key: "refresh"
+  plug NotesToSelf.Auth.CookieTokenValidator, key: "refresh_token"
+  # plug Guardian.Plug.EnsureAuthenticated
   plug Guardian.Plug.LoadResource
 end
