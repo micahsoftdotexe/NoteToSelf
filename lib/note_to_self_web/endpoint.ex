@@ -8,6 +8,7 @@ defmodule NoteToSelfWeb.Endpoint do
     store: :cookie,
     key: "_note_to_self_key",
     signing_salt: "pIGeKvAh",
+    # secure: true,
     same_site: "Lax"
   ]
 

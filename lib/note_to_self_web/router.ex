@@ -11,7 +11,7 @@ defmodule NoteToSelfWeb.Router do
   end
 
   pipeline :cookie_auth do
-    plug NoteToSelf.Auth.CookiePipeline
+    plug NoteToSelf.Auth.RefreshPipeline
   end
 
   scope "/api", NoteToSelfWeb do
@@ -21,7 +21,7 @@ defmodule NoteToSelfWeb.Router do
   end
 
   scope "/api", NoteToSelfWeb do
-    pipe_through [:api, :auth]
+    pipe_through [:fetch_session, :protect_from_forgery, :api, :auth]
     get("/user", AuthController, :show)
   end
 

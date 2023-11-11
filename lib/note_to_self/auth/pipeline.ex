@@ -4,7 +4,9 @@ defmodule NoteToSelf.Auth.Pipeline do
   error_handler: NoteToSelf.Auth.AuthErrorHandler
 
   # plug Guardian.Plug.VerifySession
-  plug Guardian.Plug.VerifyHeader
+  # plug Guardian.Plug.VerifyHeader
+  # plug Guardian.Plug.EnsureAuthenticated
+  plug NotesToSelf.Auth.CookieTokenValidator, key: "access_token"
   plug Guardian.Plug.EnsureAuthenticated
   plug Guardian.Plug.LoadResource
 end

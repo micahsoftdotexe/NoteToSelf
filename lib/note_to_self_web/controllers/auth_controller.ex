@@ -10,10 +10,15 @@ defmodule NoteToSelfWeb.AuthController do
       {:ok, user} <- Auth.authenticate(email, password),
       {:ok, jwt, _full_claims} <- Token.encode_and_sign(user, %{}, ttl: {1, :minute}),
       {:ok, cookieJWT, _full_claims} <- Token.encode_and_sign(user, %{}, [ttl: {1, :week}, type: :refresh])) do
+        delete_csrf_token()
+        csrf = get_csrf_token()
         conn
-        |> put_resp_cookie("refresh_token", cookieJWT, http_only: true)
+        |> put_resp_cookie("access_token", jwt, [http_only: true, secure: true])
+        |> put_resp_cookie("refresh_token", cookieJWT, [http_only: true, secure: true])
         |> put_resp_content_type("application/json")
-        |> send_resp(200, Jason.encode!(%{token: jwt}))
+        |> fetch_session()
+        |> put_session(:_csrf_token, Process.get(:plug_unmasked_csrf_token))
+        |> send_resp(200, Jason.encode!(%{csrf: csrf}))
     end
   end
   def register(conn, %{"user" => params}) do
@@ -25,14 +30,21 @@ defmodule NoteToSelfWeb.AuthController do
   end
 
   def show(conn, _) do
+    resource = Token.Plug.current_resource(conn)
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!("You have a valid token!"))
+    |> send_resp(200, Jason.encode!(resource.email))
   end
 
   def refresh(conn, _) do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Jason.encode!("Refreshed a token!"))
+  end
+
+  def test(conn, _) do
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Jason.encode!("Successful!"))
   end
 end
