@@ -8,8 +8,8 @@ defmodule NoteToSelfWeb.AuthController do
   def login(conn, %{"email" => email, "password" => password}) do
     with(
       {:ok, user} <- Auth.authenticate(email, password),
-      {:ok, jwt, _full_claims} <- Token.encode_and_sign(user, %{}, ttl: {1, :minute}),
-      {:ok, cookieJWT, _full_claims} <- Token.encode_and_sign(user, %{}, [ttl: {1, :week}, type: :refresh])) do
+      {:ok, jwt, _full_claims} <- Token.encode_and_sign(user, %{}, ttl: {30, :minute}),
+      {:ok, cookieJWT, _full_claims} <- Token.encode_and_sign(user, %{}, [ttl: {1, :day}, type: :refresh])) do
         delete_csrf_token()
         csrf = get_csrf_token()
         conn
