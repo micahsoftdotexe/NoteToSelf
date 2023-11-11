@@ -7,9 +7,10 @@ defmodule NoteToSelf.Auth.User do
     field :is_active, :boolean
     # field :is_staff, :boolean
     field :email, :string
-    field :password, :string, virtual: true
-    field :hashed_password, :string
+    field :password, :string, [virtual: true, redact: true]
+    field :hashed_password, :string, redact: true
     field :username, :string
+    # field :is_admin, :boolean
 
     timestamps()
   end
