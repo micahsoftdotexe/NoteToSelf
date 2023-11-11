@@ -22,10 +22,21 @@ defmodule NoteToSelfWeb.AuthController do
     end
   end
   def register(conn, %{"user" => params}) do
-    with {:ok, user} <- Auth.register_user(params) do
-      conn
-      |> put_resp_content_type("application/json")
-      |> send_resp(200, Jason.encode!("Created user #{user.username}"))
+    resource = Token.Plug.current_resource(conn)
+    if (resource && resource.is_admin) || !Auth.get_admin_user() do
+      params = if !Auth.get_admin_user() do
+        Map.put(params, "is_admin", true)
+      else
+        params
+      end
+      with {:ok, user} <- Auth.register_user(params) do
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode!("Created user #{user.username}"))
+      end
+    else
+      {:error, :unauthorized}
+
     end
   end
 

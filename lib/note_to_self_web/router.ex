@@ -14,9 +14,18 @@ defmodule NoteToSelfWeb.Router do
     plug NoteToSelf.Auth.RefreshPipeline
   end
 
+  pipeline :relax_auth do
+    plug NoteToSelf.Auth.RelaxAuthPipeline
+  end
+
   scope "/api", NoteToSelfWeb do
     pipe_through :api
     post("/login", AuthController, :login)
+    # post("/register", AuthController, :register)
+  end
+
+  scope "/api", NoteToSelfWeb do
+    pipe_through [:api, :relax_auth]
     post("/register", AuthController, :register)
   end
 

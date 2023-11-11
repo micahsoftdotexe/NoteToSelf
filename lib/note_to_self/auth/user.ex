@@ -10,7 +10,7 @@ defmodule NoteToSelf.Auth.User do
     field :password, :string, [virtual: true, redact: true]
     field :hashed_password, :string, redact: true
     field :username, :string
-    # field :is_admin, :boolean
+    field :is_admin, :boolean
 
     timestamps()
   end
@@ -35,7 +35,7 @@ defmodule NoteToSelf.Auth.User do
   """
   def registration_changeset(user, attrs ) do
     user
-    |> cast(attrs, [:email, :username, :password])
+    |> cast(attrs, [:email, :username, :password, :is_admin])
     |> validate_email
     |> validate_username
     |> validate_password

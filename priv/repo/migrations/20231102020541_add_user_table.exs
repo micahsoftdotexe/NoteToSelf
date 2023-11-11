@@ -7,6 +7,7 @@ defmodule NoteToSelf.Repo.Migrations.AddUserTable do
         add :email, :string, null: false
         add :hashed_password, :string
         add :username, :string, null: false
+        add :is_admin, :boolean, [null: false, default: false]
         timestamps()
       end
       create unique_index(:users, [:email])

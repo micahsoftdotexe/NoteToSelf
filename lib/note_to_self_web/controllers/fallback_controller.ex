@@ -28,6 +28,11 @@ defmodule NoteToSelfWeb.FallbackController do
     |> render(:"404")
   end
 
+  # def call(conn, {:error, :unauthorized}) do
+  #   conn
+  #   |> put_status(401)
+  # end
+
   def call(conn, {:error, :invalid_login}) do
     IO.puts("Within Call")
     conn

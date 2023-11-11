@@ -6,6 +6,10 @@ defmodule NoteToSelf.Auth do
     {:ok, jwt, _full_claims} = Token.encode_and_sign(user)
     jwt
   end
+
+  def get_admin_user() do
+    Repo.get_by(User, [is_admin: true])
+  end
   @doc """
   Gets a user by email and password and validates the credentials.
 
