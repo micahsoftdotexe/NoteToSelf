@@ -15,12 +15,14 @@ defmodule NoteToSelfWeb.Dtos.ErrorJSON do
   end
 
   def login(_assigns) do
-    IO.puts("Inside login")
     "Invalid Login"
   end
 
   def render(template, _assigns) do
-    IO.puts("Inside render")
     %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
+  end
+
+  def cannot_create_user(_assigns) do
+    "Cannot create user. You must be an admin"
   end
 end

@@ -34,7 +34,7 @@ defmodule NotesToSelf.Auth.CookieTokenValidator do
     |> send_resp(401, Jason.encode!("Could not validate token"))
     |> halt()
    else
-     nil
+     conn
    end
   end
 end

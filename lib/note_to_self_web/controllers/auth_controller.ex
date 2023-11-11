@@ -23,7 +23,7 @@ defmodule NoteToSelfWeb.AuthController do
   end
   def register(conn, %{"user" => params}) do
     resource = Token.Plug.current_resource(conn)
-    if (resource && resource.is_admin) || !Auth.get_admin_user() do
+    if ((resource && resource.is_admin) || !Auth.get_admin_user()) do
       params = if !Auth.get_admin_user() do
         Map.put(params, "is_admin", true)
       else
@@ -35,7 +35,8 @@ defmodule NoteToSelfWeb.AuthController do
         |> send_resp(200, Jason.encode!("Created user #{user.username}"))
       end
     else
-      {:error, :unauthorized}
+      IO.puts("Here")
+      {:error, :cannot_create_user}
 
     end
   end

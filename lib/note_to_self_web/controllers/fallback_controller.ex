@@ -28,6 +28,13 @@ defmodule NoteToSelfWeb.FallbackController do
     |> render(:"404")
   end
 
+  def call(conn, {:error, :cannot_create_user}) do
+    conn
+    |> put_status(401)
+    |> put_view(json: ErrorJSON)
+    |> render(:cannot_create_user)
+  end
+
   # def call(conn, {:error, :unauthorized}) do
   #   conn
   #   |> put_status(401)
