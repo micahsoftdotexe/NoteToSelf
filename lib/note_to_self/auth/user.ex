@@ -7,14 +7,13 @@ defmodule NoteToSelf.Auth.User do
     field :is_active, :boolean
     # field :is_staff, :boolean
     field :email, :string
-    field :password, :string, [virtual: true, redact: true]
+    field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :username, :string
     field :is_admin, :boolean
 
     timestamps()
   end
-
 
   @doc """
   A user changeset for registration.
@@ -33,7 +32,7 @@ defmodule NoteToSelf.Auth.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
-  def registration_changeset(user, attrs ) do
+  def registration_changeset(user, attrs) do
     user
     |> cast(attrs, [:email, :username, :password, :is_admin])
     |> validate_email
@@ -42,6 +41,7 @@ defmodule NoteToSelf.Auth.User do
     |> maybe_hash_password
     |> role_changeset(%{:is_active => true})
   end
+
   defp validate_email(changeset) do
     changeset
     |> validate_required([:email])
@@ -68,7 +68,9 @@ defmodule NoteToSelf.Auth.User do
     |> validate_length(:password, min: 8, max: 80)
     |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/,
+      message: "at least one digit or punctuation character"
+    )
     |> validate_confirmation(:password, message: "passwords do not match")
   end
 
@@ -117,7 +119,6 @@ defmodule NoteToSelf.Auth.User do
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password
   end
-
 
   @doc """
   Changes the status.

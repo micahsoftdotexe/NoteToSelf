@@ -8,14 +8,15 @@ defmodule NotesToSelf.Auth.CookieTokenValidator do
   @impl Plug
   def call(conn, opts) do
     relaxed = get_relax(opts)
+
     with {:ok, token} <- get_token_from_cookie(conn, opts),
-    module <- Pipeline.fetch_module!(conn, opts),
-    {:ok, claims} <- Guardian.decode_and_verify(module, token, %{}, opts) do
+         module <- Pipeline.fetch_module!(conn, opts),
+         {:ok, claims} <- Guardian.decode_and_verify(module, token, %{}, opts) do
       conn
-        |> Guardian.Plug.put_current_token(token, key: "default")
-        |> Guardian.Plug.put_current_claims(claims, key: "default")
+      |> Guardian.Plug.put_current_token(token, key: "default")
+      |> Guardian.Plug.put_current_claims(claims, key: "default")
     else
-     _error -> return_error(conn, relaxed)
+      _error -> return_error(conn, relaxed)
     end
   end
 
@@ -28,13 +29,14 @@ defmodule NotesToSelf.Auth.CookieTokenValidator do
   defp get_relax(opts) do
     Keyword.get(opts, :relax, false)
   end
+
   defp return_error(conn, relaxed) do
-   if !relaxed do
-    conn
-    |> send_resp(401, Jason.encode!("Could not validate token"))
-    |> halt()
-   else
-     conn
-   end
+    if !relaxed do
+      conn
+      |> send_resp(401, Jason.encode!("Could not validate token"))
+      |> halt()
+    else
+      conn
+    end
   end
 end

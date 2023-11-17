@@ -10,6 +10,7 @@ defmodule NoteToSelfWeb.Dtos.ErrorJSON do
   # the template name. For example, "404.json" becomes
   # "Not Found".
   alias NoteToSelfWeb.Dtos.ErrorHelpers
+
   def ecto(%{changeset: changeset}) do
     %{errors: Ecto.Changeset.traverse_errors(changeset, &ErrorHelpers.translate_error/1)}
   end
