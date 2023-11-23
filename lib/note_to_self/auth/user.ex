@@ -11,7 +11,7 @@ defmodule NoteToSelf.Auth.User do
     field :hashed_password, :string, redact: true
     field :username, :string
     field :is_admin, :boolean
-    has_many :user_note_roles, NoteToSelf.Notes.UserNoteRole
+    has_many :user_note_roles, NoteToSelf.Note.UserNoteRole
     timestamps()
   end
 

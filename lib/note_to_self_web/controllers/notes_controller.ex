@@ -9,7 +9,7 @@ defmodule NoteToSelfWeb.NotesController do
     resource = Token.Plug.current_resource(conn)
     if (resource) do
       with(
-        {:ok, %{note: note, user_note_role: _}} <- Notes.create_note_and_inital_role(resource, title)
+        {:ok, %{note: note, user_note_role: _}} <- Notes.create_note_and_role(resource, title)
 
       )do
         conn
