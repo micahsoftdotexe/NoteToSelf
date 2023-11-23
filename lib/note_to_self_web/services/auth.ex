@@ -48,6 +48,16 @@ defmodule NoteToSelfWeb.Service.Auth do
     end
   end
 
+  def refresh(user) do
+    with(
+      {:ok, response} <- fetch_tokens(user)
+    ) do
+      {:ok, response}
+    else
+      _any -> {:error, :invalid_login}
+    end
+  end
+
   def get_admin_user() do
     Repo.get_by(User, is_admin: true)
   end
@@ -77,10 +87,10 @@ defmodule NoteToSelfWeb.Service.Auth do
   defp fetch_tokens(user) do
     with(
       {:ok, jwt, _full_claims} <- Token.encode_and_sign(user, %{}, ttl: {30, :minute}),
-      {:ok, cookieJWT, _full_claims} <-
+      {:ok, refresh, _full_claims} <-
         Token.encode_and_sign(user, %{}, ttl: {1, :day}, type: :refresh)
     ) do
-      {:ok, %{:access_token => jwt, :refresh_token => cookieJWT}}
+      {:ok, %{:access_token => jwt, :refresh_token => refresh}}
     end
   end
 

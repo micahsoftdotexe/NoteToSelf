@@ -56,9 +56,10 @@ defmodule NoteToSelfWeb.AuthController do
   end
 
   def refresh(conn, _) do
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!("Refreshed a token!"))
+    resource = Token.Plug.current_resource(conn)
+    with {:ok, response} <- Auth.refresh(resource) do
+      auth_login_response(conn, response)
+    end
   end
 
   def test(conn, _) do
