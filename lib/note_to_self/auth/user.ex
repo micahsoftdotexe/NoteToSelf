@@ -3,6 +3,7 @@ defmodule NoteToSelf.Auth.User do
   import Ecto.Changeset
 
   @derive {Inspect, except: [:password]}
+  @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
     field :is_active, :boolean
     # field :is_staff, :boolean
