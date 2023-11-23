@@ -10,6 +10,8 @@ defmodule NoteToSelf.Notes.UserNoteRole do
   end
   def creation_changeset(user_note_role, attrs) do
     user_note_role
-    |> cast(attrs, [:role, :user_id, :note_id])
+    |> cast(attrs, [:role])
+    |> cast_assoc(:user, with: &NoteToSelf.Auth.User.registration_changeset/2)
+    |> cast_assoc(:note)
   end
 end

@@ -1,7 +1,7 @@
 defmodule NoteToSelfWeb.Service.Notes do
   alias NoteToSelf.Notes.{Note, UserNoteRole}
   alias NoteToSelf.Repo
-  def create_note_and_role(user, title) do
+  def create_note_and_inital_role(user, title) do
     with(
       {:ok, note} <- create_note(title),
       {:ok, user_note_role} <- create_user_note_role(user, note, :admin)
@@ -19,7 +19,7 @@ defmodule NoteToSelfWeb.Service.Notes do
   defp create_user_note_role(user, note, role) do
     # IO.puts(note)
     %UserNoteRole{}
-    |> UserNoteRole.creation_changeset(%{role: role, note_id: note.id, user_id: user.id})
+    |> UserNoteRole.creation_changeset(%{role: role, note: note.id, user: user.id})
     |> Repo.insert()
     # user_note_role = %NoteToSelf.Notes.UserNoteRole{
     #   user_id: user.id,
