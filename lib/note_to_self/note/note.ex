@@ -19,4 +19,9 @@ defmodule NoteToSelf.Notes.Note do
     |> cast(attrs, [:title, :content])
   end
 
+  def add_lock_changeset(note, attrs) do
+    note
+    |> cast(attrs, [:lock_ts, :lock_by])
+  end
+
 end

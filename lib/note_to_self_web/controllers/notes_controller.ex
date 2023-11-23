@@ -32,13 +32,17 @@ defmodule NoteToSelfWeb.NotesController do
       else
         {:error, :not_found}
       end
-      # with {:ok, note} <- Notes.get_note(id) do
-      #   IO.puts("Here")
-      #   conn
-      #   |> put_status(200)
-      #   |> put_view(json: NoteToSelfWeb.Dtos.Note)
-      #   |> render("show.json", note: note)
-      # end
+    end
+  end
+
+  def fetch_lock(conn, %{"id" => id}) do
+    user = Token.Plug.current_resource(conn)
+    with {:ok, note} <- Notes.acquire_lock(id, user) do
+      conn
+      |> put_status(200)
+      |> put_view(json: NoteToSelfWeb.Dtos.Note)
+      |> render("show.json", note: note)
+
     end
   end
 end

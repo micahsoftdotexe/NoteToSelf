@@ -41,8 +41,6 @@ defmodule NoteToSelfWeb.FallbackController do
   # end
 
   def call(conn, {:error, :invalid_login}) do
-    IO.puts("Within Call")
-
     conn
     |> put_status(401)
     |> put_view(json: ErrorJSON)
