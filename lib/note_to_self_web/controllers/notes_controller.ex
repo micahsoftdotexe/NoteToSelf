@@ -21,4 +21,24 @@ defmodule NoteToSelfWeb.NotesController do
       {:error, :not_logged_in}
     end
   end
+  def show(conn, %{"id" => id}) do
+    resource = Token.Plug.current_resource(conn)
+    if (resource && Notes.get_note_user_role(id, resource.id)) do
+      if Notes.get_note(id) do
+        conn
+        |> put_status(200)
+        |> put_view(json: NoteToSelfWeb.Dtos.Note)
+        |> render("show.json", note: Notes.get_note(id))
+      else
+        {:error, :not_found}
+      end
+      # with {:ok, note} <- Notes.get_note(id) do
+      #   IO.puts("Here")
+      #   conn
+      #   |> put_status(200)
+      #   |> put_view(json: NoteToSelfWeb.Dtos.Note)
+      #   |> render("show.json", note: note)
+      # end
+    end
+  end
 end

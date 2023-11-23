@@ -33,6 +33,7 @@ defmodule NoteToSelfWeb.Router do
     pipe_through [:fetch_session, :protect_from_forgery, :api, :auth]
     get("/user", AuthController, :show)
     post("/notes/create", NotesController, :create)
+    get("/notes/:id", NotesController, :show)
   end
 
   scope "/api", NoteToSelfWeb do

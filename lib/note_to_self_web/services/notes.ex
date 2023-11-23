@@ -10,6 +10,14 @@ defmodule NoteToSelfWeb.Service.Notes do
     end
   end
 
+  def get_note_user_role(note_id, user_id) do
+    Repo.get_by(UserNoteRole, note_id: note_id, user_id: user_id)
+  end
+
+  def get_note(id) do
+    Repo.get(Note, id)
+  end
+
   defp create_note(title) do
     %Note{}
     |> Note.initial_creation_changeset(%{title: title, content: ""})
@@ -17,15 +25,8 @@ defmodule NoteToSelfWeb.Service.Notes do
   end
 
   defp create_user_note_role(user, note, role) do
-    # IO.puts(note)
     %UserNoteRole{}
     |> UserNoteRole.creation_changeset(%{role: role, note_id: note.id, user_id: user.id})
     |> Repo.insert()
-    # user_note_role = %NoteToSelf.Notes.UserNoteRole{
-    #   user_id: user.id,
-    #   note_id: note.id,
-    #   role: to_string(role)
-    # }
-    # Repo.insert(user_note_role)
   end
 end
