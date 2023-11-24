@@ -5,8 +5,8 @@ defmodule NoteToSelf.Notes.Note do
   schema "notes" do
     field :title, :string
     field :content, :string
-    field :lock_ts, :naive_datetime
-    field :lock_by, :id
+    field :locked_ts, :naive_datetime
+    field :locked_by, :binary_id
     has_many :user_note_roles, NoteToSelf.Notes.UserNoteRole
     timestamps()
   end
@@ -22,7 +22,7 @@ defmodule NoteToSelf.Notes.Note do
 
   def add_lock_changeset(note, attrs) do
     note
-    |> cast(attrs, [:lock_ts, :lock_by])
+    |> cast(attrs, [:locked_ts, :locked_by])
   end
 
 end

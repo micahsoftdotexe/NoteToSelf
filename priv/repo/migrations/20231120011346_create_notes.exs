@@ -6,8 +6,8 @@ defmodule NoteToSelf.Repo.Migrations.CreateNotes do
       add :id, :binary_id, primary_key: true
       add :title, :string, size: 128
       add :content, :string
-      add :lock_ts, :naive_datetime
-      add :lock_by, :id
+      add :locked_ts, :naive_datetime
+      add :locked_by, :binary_id
       timestamps()
     end
 

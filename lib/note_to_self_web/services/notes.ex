@@ -20,8 +20,10 @@ defmodule NoteToSelfWeb.Service.Notes do
     end
     if (check_lock(note, user)) do
       note
-      |> Note.add_lock_changeset(%{lock_ts: NaiveDateTime.utc_now(), lock_by: user.id})
+      |> Note.add_lock_changeset(%{locked_ts: NaiveDateTime.utc_now(), locked_by: user.id})
       |> Repo.update()
+      IO.puts(note.locked_ts)
+
       {:ok, note}
     else
       {:error, :locked}

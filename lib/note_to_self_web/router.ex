@@ -34,6 +34,7 @@ defmodule NoteToSelfWeb.Router do
     get("/user", AuthController, :show)
     post("/notes/create", NotesController, :create)
     get("/notes/:id", NotesController, :show)
+    get("/notes/:id/lock", NotesController, :fetch_lock)
   end
 
   scope "/api", NoteToSelfWeb do
