@@ -1,6 +1,7 @@
 defmodule NoteToSelf.Notes.Note do
   use Ecto.Schema
   import Ecto.Changeset
+  @primary_key {:id, :binary_id, autogenerate: true}
   schema "notes" do
     field :title, :string
     field :content, :string

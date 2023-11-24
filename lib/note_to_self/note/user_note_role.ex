@@ -3,8 +3,8 @@ defmodule NoteToSelf.Notes.UserNoteRole do
   import Ecto.Changeset
   @primary_key false
   schema "user_note_roles" do
-    belongs_to :user, NoteToSelf.Auth.User, foreign_key: :user_id, primary_key: true
-    belongs_to :note, NoteToSelf.Notes.Note, foreign_key: :note_id, primary_key: true
+    belongs_to :user, NoteToSelf.Auth.User, foreign_key: :user_id, primary_key: true, type: :binary_id
+    belongs_to :note, NoteToSelf.Notes.Note, foreign_key: :note_id, primary_key: true, type: :binary_id
     field :role, Ecto.Enum, values: [:admin, :viewer, :editor]
     timestamps()
   end

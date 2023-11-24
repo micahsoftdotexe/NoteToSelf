@@ -2,7 +2,8 @@ defmodule NoteToSelf.Repo.Migrations.CreateNotes do
   use Ecto.Migration
 
   def change do
-    create table(:notes) do
+    create table(:notes, primary_key: false) do
+      add :id, :binary_id, primary_key: true
       add :title, :string, size: 128
       add :content, :string
       add :lock_ts, :naive_datetime
