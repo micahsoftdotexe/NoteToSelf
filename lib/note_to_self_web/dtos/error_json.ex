@@ -19,6 +19,22 @@ defmodule NoteToSelfWeb.Dtos.ErrorJSON do
     "Invalid Login"
   end
 
+  def unauthorized(%{message: message}) do
+    message
+  end
+
+  def unauthorized(_assigns) do
+    "Unauthorized"
+  end
+
+  def forbidden(%{message: message}) do
+    message
+  end
+
+  def forbidden(_assigns) do
+    "Forbidden"
+  end
+
   def render(template, _assigns) do
     %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
   end

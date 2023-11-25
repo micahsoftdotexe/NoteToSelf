@@ -1,5 +1,6 @@
 defmodule NoteToSelfWeb.Service.Notes do
   alias NoteToSelf.Notes.{Note, UserNoteRole}
+  alias NoteToSelf.Auth.User
   alias NoteToSelf.Repo
   def create_note_and_role(user, title) do
     with(
@@ -14,36 +15,35 @@ defmodule NoteToSelfWeb.Service.Notes do
     note = get_note(note_id)
     if !note do
       {:error, :not_found}
-    end
-    if permission_to_edit(note, user) do
-      {:error, :unauthorized}
-    end
-    if (check_lock(note, user)) do
-      note
-      |> Note.add_lock_changeset(%{locked_ts: NaiveDateTime.utc_now(), locked_by: user.id})
-      |> Repo.update()
-      IO.puts(note.locked_ts)
-
-      {:ok, note}
     else
-      {:error, :locked}
+      with(
+        {:ok} <- permission_to_edit(note, user),
+        {:ok} <- check_lock(note, user)
+      ) do
+        note
+        |> Note.add_lock_changeset(%{locked_ts: NaiveDateTime.utc_now(), locked_by: user.id})
+        |> Repo.update()
+        IO.puts(note.locked_ts)
+        {:ok, note}
+      end
     end
+
   end
 
   defp permission_to_edit(note, user) do
     note_user_role = get_note_user_role(note.id, user.id)
     if !note_user_role || (note_user_role.role != :admin && note_user_role.role != :editor) do
-      false
+      {:error, :fobidden}
     else
-      true
+      {:ok}
     end
   end
 
   defp check_lock(note, user) do
     if (note.locked_by && note.locked_by != user.id) do
-      false
+      {:error, :forbidden, "Note locked by #{Repo.get(User, note.locked_by).username}"}
     else
-      true
+      {:ok}
     end
   end
 
