@@ -25,4 +25,9 @@ defmodule NoteToSelf.Notes.Note do
     |> cast(attrs, [:locked_ts, :locked_by])
   end
 
+  def edit_changeset(note, attrs) do
+    note
+    |> cast(attrs, [:title, :content])
+  end
+
 end

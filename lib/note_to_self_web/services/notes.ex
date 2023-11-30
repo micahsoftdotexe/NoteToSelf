@@ -23,11 +23,42 @@ defmodule NoteToSelfWeb.Service.Notes do
         note
         |> Note.add_lock_changeset(%{locked_ts: NaiveDateTime.utc_now(), locked_by: user.id})
         |> Repo.update()
-        IO.puts(note.locked_ts)
-        {:ok, note}
       end
     end
 
+  end
+  def release_lock(note_id, user) do
+    note = get_note(note_id)
+    if !note do
+      {:error, :not_found}
+    else
+      with(
+        {:ok} <- permission_to_edit(note, user),
+        {:ok} <- check_lock(note, user)
+      ) do
+        note
+        |> Note.add_lock_changeset(%{locked_ts: nil, locked_by: nil})
+        |> Repo.update()
+      end
+    end
+  end
+
+  @spec edit_note(any(), any(), any()) :: any()
+  def edit_note(note_id, user, attrs) do
+    note = get_note(note_id)
+    if !note do
+      {:error, :not_found}
+    else
+      with(
+        {:ok} <- permission_to_edit(note, user),
+        {:ok} <- check_lock(note, user)
+      ) do
+        note
+        |> Note.edit_changeset(attrs)
+        |> Note.add_lock_changeset(%{locked_ts: NaiveDateTime.utc_now(), locked_by: user.id})
+        |> Repo.update()
+      end
+    end
   end
 
   defp permission_to_edit(note, user) do
@@ -40,11 +71,15 @@ defmodule NoteToSelfWeb.Service.Notes do
   end
 
   defp check_lock(note, user) do
-    if (note.locked_by && note.locked_by != user.id) do
+    if (note.locked_by && note.locked_by != user.id && (note.locked_ts && !check_lock_timeout(note.locked_ts)) ) do
       {:error, :forbidden, "Note locked by #{Repo.get(User, note.locked_by).username}"}
     else
       {:ok}
     end
+  end
+
+  defp check_lock_timeout(locked_ts) do
+    NaiveDateTime.diff(NaiveDateTime.utc_now(), locked_ts, :minute) >= 30
   end
 
   def get_note_user_role(note_id, user_id) do

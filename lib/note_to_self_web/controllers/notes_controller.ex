@@ -21,6 +21,17 @@ defmodule NoteToSelfWeb.NotesController do
       {:error, :not_logged_in}
     end
   end
+  def edit(conn, %{"id" => id, "note" => note }) do
+    resource = Token.Plug.current_resource(conn)
+    if (resource && Notes.get_note_user_role(id, resource.id)) do
+      with {:ok, note} <- Notes.edit_note(id, resource, note) do
+        conn
+        |> put_status(200)
+        |> put_view(json: NoteToSelfWeb.Dtos.Note)
+        |> render("show.json", note: note)
+      end
+    end
+  end
   def show(conn, %{"id" => id}) do
     resource = Token.Plug.current_resource(conn)
     if (resource && Notes.get_note_user_role(id, resource.id)) do
@@ -43,6 +54,15 @@ defmodule NoteToSelfWeb.NotesController do
       |> put_view(json: NoteToSelfWeb.Dtos.Note)
       |> render("show.json", note: note)
 
+    end
+  end
+  def release_lock(conn, %{"id" => id}) do
+    user = Token.Plug.current_resource(conn)
+    with {:ok, note} <- Notes.release_lock(id, user) do
+      conn
+      |> put_status(200)
+      |> put_view(json: NoteToSelfWeb.Dtos.Note)
+      |> render("show.json", note: note)
     end
   end
 end
