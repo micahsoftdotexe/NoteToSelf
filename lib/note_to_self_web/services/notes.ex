@@ -1,4 +1,5 @@
 defmodule NoteToSelfWeb.Service.Notes do
+  import Ecto.Query
   alias NoteToSelf.Notes.{Note, UserNoteRole}
   alias NoteToSelf.Auth.User
   alias NoteToSelf.Repo
@@ -43,6 +44,14 @@ defmodule NoteToSelfWeb.Service.Notes do
     end
   end
 
+  def list_notes(user) do
+    query = from n in Note,
+    inner_join: unr in UserNoteRole, on: n.id == unr.note_id,
+    where: unr.user_id == ^user.id
+    notes = Repo.all(query)
+    {:ok, notes}
+  end
+
   @spec edit_note(any(), any(), any()) :: any()
   def edit_note(note_id, user, attrs) do
     note = get_note(note_id)
@@ -58,6 +67,26 @@ defmodule NoteToSelfWeb.Service.Notes do
         |> Note.add_lock_changeset(%{locked_ts: NaiveDateTime.utc_now(), locked_by: user.id})
         |> Repo.update()
       end
+    end
+  end
+
+  def delete_note(note_id, user) do
+    note = get_note(note_id)
+    if !note do
+      {:error, :not_found}
+    else
+      with {:ok} <- permission_to_delete(note, user) do
+        Repo.delete(note)
+      end
+    end
+  end
+
+  defp permission_to_delete(note, user) do
+    note_user_role = get_note_user_role(note.id, user.id)
+    if !note_user_role || (note_user_role.role != :admin) do
+      {:error, :fobidden}
+    else
+      {:ok}
     end
   end
 

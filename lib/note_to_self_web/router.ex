@@ -33,7 +33,11 @@ defmodule NoteToSelfWeb.Router do
     pipe_through [:fetch_session, :protect_from_forgery, :api, :auth]
     get("/user", AuthController, :show)
     post("/notes/create", NotesController, :create)
+    get("/notes", NotesController, :list)
     get("/notes/:id", NotesController, :show)
+    delete("/notes/:id", NotesController, :delete)
+    post("notes/:id/user", NotesController, :create_user_note_role)
+    delete("notes/:id/user", NotesController, :delete_user_note_role)
     get("/notes/lock/:id", NotesController, :fetch_lock)
     get("/notes/release/:id", NotesController, :release_lock)
     post("/notes/edit/:id", NotesController, :edit)
