@@ -130,4 +130,34 @@ defmodule NoteToSelfWeb.Service.Notes do
     |> UserNoteRole.creation_changeset(%{role: role, note_id: note.id, user_id: user.id})
     |> Repo.insert()
   end
+
+  defp delete_user_note_role(user, note) do
+    user_note_role = get_note_user_role(note.id, user.id)
+    if user_note_role do
+      with {:ok, _} <- Repo.delete(user_note_role) do
+        {:ok}
+      else
+        {:error, _} -> {:error, :not_found}
+      end
+
+    else
+      {:error, :not_found}
+    end
+  end
+
+  def add_user_note_role(user, note, role, created_by) do
+    if get_note_user_role(note.id, created_by.id) && get_note_user_role(note.id, created_by.id).role == :admin do
+      create_user_note_role(user, note, role)
+    else
+      {:error, :forbidden, "Only note admin can add role"}
+    end
+  end
+
+  def delete_user_note_role(note_id, user, note, created_by) do
+    if (get_note_user_role(note_id, created_by.id) && get_note_user_role(note_id, created_by.id).role == :admin) || user == created_by do
+      delete_user_note_role(user, note)
+    else
+      {:error, :forbidden, "Only note admin can remove role"}
+    end
+  end
 end

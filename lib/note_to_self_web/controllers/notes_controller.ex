@@ -1,7 +1,7 @@
 defmodule NoteToSelfWeb.NotesController do
   use NoteToSelfWeb, :controller
   alias NoteToSelf.Auth.Token
-  alias NoteToSelfWeb.Service.Notes
+  alias NoteToSelfWeb.Service.{Auth,Notes}
 
 
   action_fallback NoteToSelfWeb.FallbackController
@@ -74,6 +74,46 @@ defmodule NoteToSelfWeb.NotesController do
   def release_lock(conn, %{"id" => id}) do
     user = Token.Plug.current_resource(conn)
     with {:ok, note} <- Notes.release_lock(id, user) do
+      conn
+      |> put_status(200)
+      |> put_view(json: NoteToSelfWeb.Dtos.Note)
+      |> render("show.json", note: note)
+    end
+  end
+  def create_user_note_role(conn, %{"username" => username, "id" => id, "role" => role}) do
+    resource = Token.Plug.current_resource(conn)
+    user = Auth.get_user_by_username(username)
+    note = Notes.get_note(id)
+    if  (user && note) do
+      create_role(user, note, role, resource, conn)
+    else
+      {:error, :not_found}
+    end
+  end
+  def create_user_note_role(conn, %{"email" => email, "id" => id, "role" => role}) do
+    resource = Token.Plug.current_resource(conn)
+    user = Auth.get_user_by_email(email)
+    note = Notes.get_note(id)
+    if  (user && note) do
+      create_role(user, note, role, resource, conn)
+    else
+      {:error, :not_found}
+    end
+  end
+  def delete_user_note_role(conn, %{"user_id" => user_id, "id" => id}) do
+    resource = Token.Plug.current_resource(conn)
+    user = Auth.get_user(user_id)
+    note = Notes.get_note(id)
+    with {:ok} <- Notes.delete_user_note_role(id, user, note, resource) do
+      conn
+      |> put_status(200)
+      |> put_view(json: NoteToSelfWeb.Dtos.Note)
+      |> render("show.json", note: note)
+    end
+  end
+
+  defp create_role(user, note, role, created_by, conn) do
+    with {:ok, _user_note_role} <- Notes.add_user_note_role(user, note, String.to_existing_atom(role), created_by) do
       conn
       |> put_status(200)
       |> put_view(json: NoteToSelfWeb.Dtos.Note)
