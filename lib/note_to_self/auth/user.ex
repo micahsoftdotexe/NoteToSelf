@@ -12,6 +12,7 @@ defmodule NoteToSelf.Auth.User do
     field :hashed_password, :string, redact: true
     field :username, :string
     field :is_admin, :boolean
+    field :disabledTS, :naive_datetime
 
     timestamps()
   end
@@ -127,6 +128,12 @@ defmodule NoteToSelf.Auth.User do
   def role_changeset(user, attrs \\ %{}) do
     user
     |> cast(attrs, [:is_active])
+  end
+
+
+  def disabled_changeset(user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:disabledTS])
   end
 
   @doc """

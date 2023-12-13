@@ -62,6 +62,19 @@ defmodule NoteToSelfWeb.AuthController do
     end
   end
 
+  def disable(conn, %{"user_id" => user_id}) do
+    resource = Token.Plug.current_resource(conn)
+    if resource.id == user_id || resource.is_admin do
+      with {:ok, _response} <- Auth.disable(user_id) do
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode!("Disabled user #{user_id}"))
+      end
+    else
+      {:error, :unauthorized}
+    end
+  end
+
   def test(conn, _) do
     conn
     |> put_resp_content_type("application/json")

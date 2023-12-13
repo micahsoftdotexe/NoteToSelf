@@ -9,4 +9,5 @@ defmodule NoteToSelf.Auth.RefreshPipeline do
   plug NotesToSelf.Auth.CookieTokenValidator, key: "refresh_token"
   plug Guardian.Plug.EnsureAuthenticated
   plug Guardian.Plug.LoadResource
+  plug NoteToSelf.Auth.DisabledUserValidator
 end

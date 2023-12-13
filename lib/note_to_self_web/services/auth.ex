@@ -58,6 +58,20 @@ defmodule NoteToSelfWeb.Service.Auth do
     end
   end
 
+  def get_user(id) do
+    Repo.get(User, id)
+  end
+
+  def disable(user_id) do
+    user = get_user(user_id)
+    if user do
+      user = User.disabled_changeset(user, %{disabledTS: NaiveDateTime.utc_now()})
+      Repo.update(user)
+    else
+      {:error, :not_found}
+    end
+  end
+
   def get_admin_user() do
     Repo.get_by(User, is_admin: true)
   end
