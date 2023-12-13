@@ -12,4 +12,5 @@ defmodule NoteToSelf.Notes.UserNoteRole do
     user_note_role
     |> cast(attrs, [:role, :user_id, :note_id])
   end
+
 end

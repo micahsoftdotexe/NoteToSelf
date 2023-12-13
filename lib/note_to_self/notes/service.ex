@@ -1,8 +1,8 @@
-defmodule NoteToSelfWeb.Service.Notes do
-  import Ecto.Query
+defmodule NoteToSelf.Notes.Service do
   alias NoteToSelf.Notes.{Note, UserNoteRole}
   alias NoteToSelf.Auth.User
   alias NoteToSelf.Repo
+  @spec create_note_and_role(any(), any()) :: any()
   def create_note_and_role(user, title) do
     with(
       {:ok, note} <- create_note(title),
@@ -13,7 +13,7 @@ defmodule NoteToSelfWeb.Service.Notes do
   end
 
   def acquire_lock(note_id, user) do
-    note = get_note(note_id)
+    note = Note.get_note(note_id)
     if !note do
       {:error, :not_found}
     else
@@ -29,7 +29,7 @@ defmodule NoteToSelfWeb.Service.Notes do
 
   end
   def release_lock(note_id, user) do
-    note = get_note(note_id)
+    note = Note.get_note(note_id)
     if !note do
       {:error, :not_found}
     else
@@ -45,16 +45,12 @@ defmodule NoteToSelfWeb.Service.Notes do
   end
 
   def list_notes(user) do
-    query = from n in Note,
-    inner_join: unr in UserNoteRole, on: n.id == unr.note_id,
-    where: unr.user_id == ^user.id
-    notes = Repo.all(query)
-    {:ok, notes}
+    Note.get_notes_for_user(user)
   end
 
   @spec edit_note(any(), any(), any()) :: any()
   def edit_note(note_id, user, attrs) do
-    note = get_note(note_id)
+    note = Note.get_note(note_id)
     if !note do
       {:error, :not_found}
     else
@@ -71,7 +67,7 @@ defmodule NoteToSelfWeb.Service.Notes do
   end
 
   def delete_note(note_id, user) do
-    note = get_note(note_id)
+    note = Note.get_note(note_id)
     if !note do
       {:error, :not_found}
     else
@@ -115,36 +111,6 @@ defmodule NoteToSelfWeb.Service.Notes do
     Repo.get_by(UserNoteRole, note_id: note_id, user_id: user_id)
   end
 
-  def get_note(id) do
-    Repo.get(Note, id)
-  end
-
-  defp create_note(title) do
-    %Note{}
-    |> Note.initial_creation_changeset(%{title: title, content: ""})
-    |> Repo.insert()
-  end
-
-  defp create_user_note_role(user, note, role) do
-    %UserNoteRole{}
-    |> UserNoteRole.creation_changeset(%{role: role, note_id: note.id, user_id: user.id})
-    |> Repo.insert()
-  end
-
-  defp delete_user_note_role(user, note) do
-    user_note_role = get_note_user_role(note.id, user.id)
-    if user_note_role do
-      with {:ok, _} <- Repo.delete(user_note_role) do
-        {:ok}
-      else
-        {:error, _} -> {:error, :not_found}
-      end
-
-    else
-      {:error, :not_found}
-    end
-  end
-
   def add_user_note_role(user, note, role, created_by) do
     if get_note_user_role(note.id, created_by.id) && get_note_user_role(note.id, created_by.id).role == :admin do
       create_user_note_role(user, note, role)
@@ -159,5 +125,30 @@ defmodule NoteToSelfWeb.Service.Notes do
     else
       {:error, :forbidden, "Only note admin can remove role"}
     end
+  end
+
+
+  defp create_user_note_role(user, note, role) do
+    %UserNoteRole{}
+    |> UserNoteRole.creation_changeset(%{role: role, note_id: note.id, user_id: user.id})
+    |> Repo.insert()
+  end
+  defp delete_user_note_role(user, note) do
+    user_note_role = get_note_user_role(note.id, user.id)
+    if user_note_role do
+      with {:ok, _} <- Repo.delete(user_note_role) do
+        {:ok}
+      else
+        {:error, _} -> {:error, :not_found}
+      end
+
+    else
+      {:error, :not_found}
+    end
+  end
+  defp create_note(title) do
+    %Note{}
+    |> Note.initial_creation_changeset(%{title: title, content: ""})
+    |> Repo.insert()
   end
 end

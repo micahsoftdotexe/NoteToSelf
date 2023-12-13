@@ -1,4 +1,4 @@
-defmodule NoteToSelfWeb.Service.Auth do
+defmodule NoteToSelf.Auth.Service do
   alias NoteToSelf.Repo
   alias NoteToSelf.Auth.{User, Token}
 
@@ -58,12 +58,8 @@ defmodule NoteToSelfWeb.Service.Auth do
     end
   end
 
-  def get_user(id) do
-    Repo.get(User, id)
-  end
-
   def disable(user_id) do
-    user = get_user(user_id)
+    user = User.get_user(user_id)
     if user do
       user = User.disabled_changeset(user, %{disabledTS: NaiveDateTime.utc_now()})
       Repo.update(user)
@@ -73,7 +69,7 @@ defmodule NoteToSelfWeb.Service.Auth do
   end
 
   def enable(user_id) do
-    user = get_user(user_id)
+    user = User.get_user(user_id)
     if user do
       user = User.disabled_changeset(user, %{disabledTS: nil})
       Repo.update(user)
@@ -83,9 +79,9 @@ defmodule NoteToSelfWeb.Service.Auth do
   end
 
   def find(identifying_info) do
-    user = Repo.get_by(User, email: identifying_info)
+    user = User.get_user_by_email(identifying_info)
     if !user do
-      user = Repo.get_by(User, username: identifying_info)
+      user = User.get_user_by_username(identifying_info)
       if user do
         {:ok, user}
       else
@@ -97,21 +93,9 @@ defmodule NoteToSelfWeb.Service.Auth do
 
   end
 
-  def get_admin_user() do
-    Repo.get_by(User, is_admin: true)
-  end
-
-  def get_user_by_username(username) do
-    Repo.get_by(User, username: username)
-  end
-
-  def get_user_by_email(email) do
-    Repo.get_by(User, email: email)
-  end
-
   defp authenticate(email, password)
     when is_binary(email) and is_binary(password) do
-      user = Repo.get_by(User, email: email)
+      user = User.get_user_by_email(email)
 
       if User.valid_password?(user, password) && user.disabledTS == nil do
         {:ok, user}
@@ -122,7 +106,7 @@ defmodule NoteToSelfWeb.Service.Auth do
 
   defp authenticate_username(username, password)
     when is_binary(username) and is_binary(password) do
-      user = Repo.get_by(User, username: username)
+      user = User.get_user_by_username(username)
 
       if User.valid_password?(user, password) && user.disabledTS == nil do
         {:ok, user}

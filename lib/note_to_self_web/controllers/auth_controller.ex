@@ -1,18 +1,17 @@
 defmodule NoteToSelfWeb.AuthController do
   use NoteToSelfWeb, :controller
-  alias NoteToSelf.Auth.{Token}
-  alias NoteToSelfWeb.Service.Auth
+  alias NoteToSelf.Auth.{User, Token, Service}
 
   action_fallback NoteToSelfWeb.FallbackController
 
   def login(conn, %{"email" => email, "password" => password}) do
-    with {:ok, response} <- Auth.login(email, password) do
+    with {:ok, response} <- Service.login(email, password) do
       auth_login_response(conn, response)
     end
   end
 
   def login(conn, %{"username" => username, "password" => password}) do
-    with {:ok, response} <- Auth.login_username(username, password) do
+    with {:ok, response} <- Service.login_username(username, password) do
       auth_login_response(conn, response)
     end
   end
@@ -34,10 +33,10 @@ defmodule NoteToSelfWeb.AuthController do
     resource = Token.Plug.current_resource(conn)
 
     # TODO: Replace the following check if you want anyone to register to application. It will allow the first user created to be an admin
-    if (resource && resource.is_admin) || !Auth.get_admin_user() do
-      params = if !Auth.get_admin_user(), do: Map.put(params, "is_admin", true), else: params
+    if (resource && resource.is_admin) || !User.get_admin_user() do
+      params = if !User.get_admin_user(), do: Map.put(params, "is_admin", true), else: params
 
-      with {:ok, user} <- Auth.register_user(params) do
+      with {:ok, user} <- Service.register_user(params) do
         conn
         |> put_resp_content_type("application/json")
         |> send_resp(200, Jason.encode!("Created user #{user.username}"))
@@ -57,7 +56,7 @@ defmodule NoteToSelfWeb.AuthController do
 
   def refresh(conn, _) do
     resource = Token.Plug.current_resource(conn)
-    with {:ok, response} <- Auth.refresh(resource) do
+    with {:ok, response} <- Service.refresh(resource) do
       auth_login_response(conn, response)
     end
   end
@@ -65,7 +64,7 @@ defmodule NoteToSelfWeb.AuthController do
   def disable(conn, %{"user_id" => user_id}) do
     resource = Token.Plug.current_resource(conn)
     if resource.id == user_id || resource.is_admin do
-      with {:ok, _response} <- Auth.disable(user_id) do
+      with {:ok, _response} <- Service.disable(user_id) do
         conn
         |> put_resp_content_type("application/json")
         |> send_resp(200, Jason.encode!("Disabled user #{user_id}"))
@@ -78,7 +77,7 @@ defmodule NoteToSelfWeb.AuthController do
   def enable(conn, %{"user_id" => user_id}) do
     resource = Token.Plug.current_resource(conn)
     if resource.is_admin do
-      with {:ok, _response} <- Auth.enable(user_id) do
+      with {:ok, _response} <- Service.enable(user_id) do
         conn
         |> put_resp_content_type("application/json")
         |> send_resp(200, Jason.encode!("Enabled user #{user_id}"))
@@ -91,7 +90,7 @@ defmodule NoteToSelfWeb.AuthController do
   def find(conn, %{"identifying_info" => identifying_info}) do
     resource = Token.Plug.current_resource(conn)
     if resource.is_admin do
-      with {:ok, user} <- Auth.find(identifying_info) do
+      with {:ok, user} <- Service.find(identifying_info) do
         conn
         |> put_status(200)
         |> put_view(json: NoteToSelfWeb.Dtos.User)

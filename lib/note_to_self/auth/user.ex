@@ -1,5 +1,6 @@
 defmodule NoteToSelf.Auth.User do
   use Ecto.Schema
+  alias NoteToSelf.Repo
   import Ecto.Changeset
 
   @derive {Inspect, except: [:password]}
@@ -146,4 +147,21 @@ defmodule NoteToSelf.Auth.User do
     Argon2.no_user_verify()
     false
   end
+  def get_user(id) do
+    Repo.get(__MODULE__, id)
+  end
+  def get_admin_user() do
+    Repo.get_by(__MODULE__, is_admin: true)
+  end
+
+  def get_user_by_username(username) do
+    Repo.get_by(__MODULE__, username: username)
+  end
+
+  def get_user_by_email(email) do
+    Repo.get_by(__MODULE__, email: email)
+  end
+
+
+
 end
