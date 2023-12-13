@@ -35,14 +35,21 @@ defmodule NoteToSelfWeb.FallbackController do
     |> render(:cannot_create_user)
   end
 
-  # def call(conn, {:error, :unauthorized}) do
-  #   conn
-  #   |> put_status(401)
-  # end
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(401)
+    |> put_view(json: ErrorJSON)
+    |> render("unauthorized.json")
+  end
+
+  def call(conn, {:error, :unauthorized, message}) do
+    conn
+    |> put_status(401)
+    |> put_view(json: ErrorJSON)
+    |> render("unauthorized.json", message: message)
+  end
 
   def call(conn, {:error, :invalid_login}) do
-    IO.puts("Within Call")
-
     conn
     |> put_status(401)
     |> put_view(json: ErrorJSON)

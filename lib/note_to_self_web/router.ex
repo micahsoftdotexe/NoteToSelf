@@ -35,6 +35,15 @@ defmodule NoteToSelfWeb.Router do
     get("/disable/:user_id", AuthController, :disable)
     get("/enable/:user_id", AuthController, :enable)
     get("/user/:identifying_info", AuthController, :find)
+    post("/notes/create", NotesController, :create)
+    get("/notes", NotesController, :list)
+    get("/notes/:id", NotesController, :show)
+    delete("/notes/:id", NotesController, :delete)
+    post("/notes/:id/user", NotesController, :create_user_note_role)
+    delete("/notes/:id/user/:user_id", NotesController, :delete_user_note_role)
+    get("/notes/lock/:id", NotesController, :fetch_lock)
+    get("/notes/release/:id", NotesController, :release_lock)
+    post("/notes/edit/:id", NotesController, :edit)
   end
 
   scope "/api", NoteToSelfWeb do

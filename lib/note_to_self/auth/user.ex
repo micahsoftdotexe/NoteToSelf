@@ -12,6 +12,7 @@ defmodule NoteToSelf.Auth.User do
     field :username, :string
     field :is_admin, :boolean
     field :disabledTS, :naive_datetime
+    has_many :user_note_roles, NoteToSelf.Notes.UserNoteRole
 
     timestamps()
   end
@@ -33,6 +34,10 @@ defmodule NoteToSelf.Auth.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :username, :is_admin])
+  end
   def registration_changeset(user, attrs) do
     user
     |> cast(attrs, [:email, :username, :password, :is_admin])
