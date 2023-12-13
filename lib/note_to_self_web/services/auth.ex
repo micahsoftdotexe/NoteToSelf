@@ -102,25 +102,25 @@ defmodule NoteToSelfWeb.Service.Auth do
   end
 
   defp authenticate(email, password)
-       when is_binary(email) and is_binary(password) do
-    user = Repo.get_by(User, email: email)
+    when is_binary(email) and is_binary(password) do
+      user = Repo.get_by(User, email: email)
 
-    if User.valid_password?(user, password) do
-      {:ok, user}
-    else
-      {:error, :invalid_login}
-    end
+      if User.valid_password?(user, password) && user.disabledTS == nil do
+        {:ok, user}
+      else
+        {:error, :invalid_login}
+      end
   end
 
   defp authenticate_username(username, password)
-       when is_binary(username) and is_binary(password) do
-    user = Repo.get_by(User, username: username)
+    when is_binary(username) and is_binary(password) do
+      user = Repo.get_by(User, username: username)
 
-    if User.valid_password?(user, password) do
-      {:ok, user}
-    else
-      {:error, :invalid_login}
-    end
+      if User.valid_password?(user, password) && user.disabledTS == nil do
+        {:ok, user}
+      else
+        {:error, :invalid_login}
+      end
   end
 
   defp fetch_tokens(user) do

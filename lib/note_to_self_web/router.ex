@@ -25,7 +25,7 @@ defmodule NoteToSelfWeb.Router do
   end
 
   scope "/api", NoteToSelfWeb do
-    pipe_through [:api, :relax_auth]
+    pipe_through [:api, :fetch_session, :relax_auth]
     post("/register", AuthController, :register)
   end
 

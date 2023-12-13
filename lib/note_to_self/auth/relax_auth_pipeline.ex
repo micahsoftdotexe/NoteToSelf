@@ -9,5 +9,6 @@ defmodule NoteToSelf.Auth.RelaxAuthPipeline do
   plug NotesToSelf.Auth.CookieTokenValidator, key: "refresh_token", relax: true
   # plug Guardian.Plug.EnsureAuthenticated
   plug Guardian.Plug.LoadResource, allow_blank: true
+  plug NoteToSelf.Auth.RelaxCsrfToken
   plug NoteToSelf.Auth.DisabledUserValidator, relax: true
 end

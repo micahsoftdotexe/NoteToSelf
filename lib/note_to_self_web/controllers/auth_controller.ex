@@ -93,8 +93,9 @@ defmodule NoteToSelfWeb.AuthController do
     if resource.is_admin do
       with {:ok, user} <- Auth.find(identifying_info) do
         conn
-        |> put_resp_content_type("application/json")
-        |> send_resp(200, Jason.encode!(user))
+        |> put_status(200)
+        |> put_view(json: NoteToSelfWeb.Dtos.User)
+        |> render("show.json", user: user)
       end
     else
       {:error, :unauthorized}

@@ -4,7 +4,6 @@ defmodule NoteToSelf.Repo.Migrations.AddUserTable do
   def change do
     create table(:users, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :is_active, :boolean
       add :email, :string, null: false
       add :hashed_password, :string
       add :username, :string, null: false

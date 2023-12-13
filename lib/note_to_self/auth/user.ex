@@ -5,7 +5,6 @@ defmodule NoteToSelf.Auth.User do
   @derive {Inspect, except: [:password]}
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
-    field :is_active, :boolean
     # field :is_staff, :boolean
     field :email, :string
     field :password, :string, virtual: true, redact: true
@@ -41,7 +40,6 @@ defmodule NoteToSelf.Auth.User do
     |> validate_username
     |> validate_password
     |> maybe_hash_password
-    |> role_changeset(%{:is_active => true})
   end
 
   defp validate_email(changeset) do
@@ -120,14 +118,6 @@ defmodule NoteToSelf.Auth.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password
-  end
-
-  @doc """
-  Changes the status.
-  """
-  def role_changeset(user, attrs \\ %{}) do
-    user
-    |> cast(attrs, [:is_active])
   end
 
 

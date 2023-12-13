@@ -16,7 +16,7 @@ defmodule NoteToSelfWeb.Dtos.ErrorJSON do
   end
 
   def login(_assigns) do
-    "Invalid Login"
+    "Invalid Login or user disabled"
   end
 
   def render(template, _assigns) do
