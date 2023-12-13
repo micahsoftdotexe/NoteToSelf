@@ -10,4 +10,5 @@ defmodule NoteToSelf.Auth.Pipeline do
   plug NotesToSelf.Auth.CookieTokenValidator, key: "access_token"
   plug Guardian.Plug.EnsureAuthenticated
   plug Guardian.Plug.LoadResource
+  plug NoteToSelf.Auth.DisabledUserValidator
 end

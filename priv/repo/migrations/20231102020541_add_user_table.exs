@@ -9,6 +9,7 @@ defmodule NoteToSelf.Repo.Migrations.AddUserTable do
       add :hashed_password, :string
       add :username, :string, null: false
       add :is_admin, :boolean, null: false, default: false
+      add :disabledTS, :naive_datetime
       timestamps()
     end
 
