@@ -72,6 +72,31 @@ defmodule NoteToSelfWeb.Service.Auth do
     end
   end
 
+  def enable(user_id) do
+    user = get_user(user_id)
+    if user do
+      user = User.disabled_changeset(user, %{disabledTS: nil})
+      Repo.update(user)
+    else
+      {:error, :not_found}
+    end
+  end
+
+  def find(identifying_info) do
+    user = Repo.get_by(User, email: identifying_info)
+    if !user do
+      user = Repo.get_by(User, username: identifying_info)
+      if user do
+        {:ok, user}
+      else
+        {:error, :not_found}
+      end
+    else
+      {:ok, user}
+    end
+
+  end
+
   def get_admin_user() do
     Repo.get_by(User, is_admin: true)
   end
