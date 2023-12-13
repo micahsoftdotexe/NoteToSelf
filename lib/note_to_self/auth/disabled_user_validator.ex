@@ -9,7 +9,7 @@ defmodule NoteToSelf.Auth.DisabledUserValidator do
   def call(conn, opts) do
     user = Guardian.Plug.current_resource(conn)
     cond do
-      user && user.disabled ->
+      user && user.disabledTS ->
         conn |> send_resp(401, Jason.encode!("User is disabled")) |> halt()
       !user && get_relax(opts) ->
         conn

@@ -33,6 +33,8 @@ defmodule NoteToSelfWeb.Router do
     pipe_through [:fetch_session, :protect_from_forgery, :api, :auth]
     get("/user", AuthController, :show)
     get("/disable/:user_id", AuthController, :disable)
+    get("/enable/:user_id", AuthController, :enable)
+    get("/user/:identifying_info", AuthController, :find)
   end
 
   scope "/api", NoteToSelfWeb do

@@ -52,7 +52,7 @@ defmodule NoteToSelfWeb.AuthController do
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(resource.email))
+    |> send_resp(200, Jason.encode!(resource.id))
   end
 
   def refresh(conn, _) do
@@ -69,6 +69,32 @@ defmodule NoteToSelfWeb.AuthController do
         conn
         |> put_resp_content_type("application/json")
         |> send_resp(200, Jason.encode!("Disabled user #{user_id}"))
+      end
+    else
+      {:error, :unauthorized}
+    end
+  end
+
+  def enable(conn, %{"user_id" => user_id}) do
+    resource = Token.Plug.current_resource(conn)
+    if resource.is_admin do
+      with {:ok, _response} <- Auth.enable(user_id) do
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode!("Enabled user #{user_id}"))
+      end
+    else
+      {:error, :unauthorized}
+    end
+  end
+
+  def find(conn, %{"identifying_info" => identifying_info}) do
+    resource = Token.Plug.current_resource(conn)
+    if resource.is_admin do
+      with {:ok, user} <- Auth.find(identifying_info) do
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode!(user))
       end
     else
       {:error, :unauthorized}
